@@ -1,148 +1,56 @@
-        actions based on the survey data.*
-        *Format your report in markdown to highlight important points and structure the narrative clearly.*
-        *Ensure each fact is properly sourced and include attributions in the footnotes. Use the provided raw survey data and calculation details to explain the exact data points used to get a statistic.*
-        **Detailed Report Instructions:**
-        1. **Cover Page:**
-           - Provide a cover page.
-           The current date is
-           ```
-           {today_date}
-           ```
-           and the report is being prepared for ACT Venture Capital
-        2. **Key Findings:**
-           - Summarize the most important results.
-           - Highlight significant trends and patterns.
-           - Ensure each fact is properly sourced and include attributions in the footnotes.
-        3. **Environmental, Social, and Governance (ESG) Analysis:**
-           - **Environmental:**
-             - Analyze the survey data related to environmental factors.
-             - Discuss key findings, trends, and implications.
-             - Highlight any critical issues and suggest recommendations.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-           - **Social:**
-             - Analyze the survey data related to social factors.
-             - Discuss key findings, trends, and implications.
-             - Highlight any critical issues and suggest recommendations.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-           - **Governance:**
-             - Analyze the survey data related to governance factors.
-             - Discuss key findings, trends, and implications.
-             - Highlight any critical issues and suggest recommendations.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-        4. **SWOT Analysis:**
-           - **Strengths:**
-             - Identify and discuss the strengths revealed by the survey data.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-           - **Weaknesses:**
-             - Identify and discuss the weaknesses revealed by the survey data.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-           - **Opportunities:**
-             - Identify and discuss the opportunities revealed by the survey data.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-           - **Threats:**
-             - Identify and discuss the threats revealed by the survey data.
-             - Ensure each fact is properly sourced and include attributions in the footnotes.
-        5. **Critical Issues:**
-           - Point out any critical issues raised by the survey.
-           - Discuss potential impacts and risks associated with these issues.
-           - Ensure each fact is properly sourced and include attributions in the footnotes.
-        6. **Recommendations:**
-           - Provide actionable recommendations based on the survey data.
-           - Suggest specific steps or strategies to address the issues identified.
-           - Ensure each fact is properly sourced and include attributions in the footnotes.
-        7. **Conclusion:**
-           - Summarize the key takeaways from the report.
-           - Reiterate the importance of addressing the identified issues and implementing the recommendations.
-           - Ensure each fact is properly sourced and include attributions in the footnotes.
-        **Calculation Details:**
-        {calculation_details}
-        {pages[0]}
-        """
-
-        st.session_state.conversation_history.append({"role": "user", "content": summary_prompt})
-
-        client.beta.threads.messages.create(
-            thread_id=st.session_state.thread.id,
-            role="user",
-            content=summary_prompt
-        )
-
-        run = client.beta.threads.runs.create_and_poll(
-            thread_id=st.session_state.thread.id,
-            assistant_id=st.session_state.assistant.id,
-        )
-
-        if run.status == 'completed':
-            messages = client.beta.threads.messages.list(thread_id=st.session_state.thread.id)
-            if messages.data:
-                for message in messages.data:
-                    if message.role == "assistant":
-                        summary_content = "".join([block.text.value for block in message.content if block.type == "text"]).strip()  # Extract the text content
-
-                        st.session_state.conversation_history.append({"role": "assistant", "content": summary_content})
-                        st.session_state.messages.append({"role": "assistant", "content": summary_content})
-                        st.session_state.report_content = summary_content  # Store the report content
-                        st.session_state.report_generated = True  # Update the report generated status
-                        break
-            else:
-                st.error("No messages found in the thread.")
-        else:
-            st.error(f"Report generation failed with status: {run.status}")
-
-if st.button('Generate Summary Report for All Companies'):
-    generate_report()
-
-if st.button('Generate Report for Selected Company'):
-    company_id = int(selected_company.split()[-1])
-    generate_company_report(company_id)
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-with st.sidebar:
-    if st.session_state.report_generated and st.session_state.report_content:
-        report_bytes = st.session_state.report_content.encode('utf-8')
-        report_buffer = BytesIO(report_bytes)
-
-        st.download_button(
-            label="Download Report as Markdown",
-            data=report_buffer,
-            file_name="esg_report.md",
-            mime="text/markdown"
-        )
-
-if st.session_state.report_generated:
-    st.header("Ask Follow-up Questions")
-    user_question = st.chat_input("Enter your question related to the report:")
-
-    if user_question:
-        st.session_state.conversation_history.append({"role": "user", "content": user_question})
-        st.session_state.messages.append({"role": "user", "content": user_question})
-
-        client.beta.threads.messages.create(
-            thread_id=st.session_state.thread.id,
-            role="user",
-            content=user_question
-        )
-
-        with st.spinner('Generating response...'):
-            run = client.beta.threads.runs.create_and_poll(
-                thread_id=st.session_state.thread.id,
-                assistant_id=st.session_state.assistant.id,
-            )
-
-        if run.status == 'completed':
-            messages = client.beta.threads.messages.list(thread_id=st.session_state.thread.id)
-            if messages.data:
-                for message in messages.data:
-                    if message.role == "assistant":
-                        follow_up_content = "".join([block.text.value for block in message.content if block.type == "text"]).strip()  # Extract the text content
-
-                        st.session_state.messages.append({"role": "assistant", "content": follow_up_content})
-                        st.write(follow_up_content)
-                        break
-            else:
-                st.error("No messages found in the thread.")
-        else:
-            st.error(f"Follow-up question failed with status: {run.status}")
+# Question-answer mapping for processing survey data
+question_answer_mapping = {
+    'Do you measure your carbon footprint?': ['Yes - Scope 1', 'Yes - Scopes 1 & 2', 'Yes - Scopes 1-3', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have a policy and programme in place to achieve net zero carbon? Including a stated date for achieving net zero with specific milestones and monitoring plans.': ['Yes - 2030', 'Yes - Other date (Please indicate date in Column G)', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have external carbon certifications for your business, or do you include carbon reporting in your annual external audit?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you use any carbon offsetting tools or initiatives to offset your carbon emissions?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    "What percentage of your office's energy consumption comes from renewable sources? If you do not have an office space, please select not relevant.": ['Not relevant', 'We currently do not track this metric', 'We plan to report this metric in the next 12 months'],
+    'What percentage of your employees take part in sustainable travel initiatives?': ['Not relevant', 'We currently do not track this metric', 'We plan to report this metric in the next 12 months', '0%', '1-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
+    'Do you have a corporate scheme in place to reduce the emissions of your plane travel?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'Do you have measures to reduce the emissions of your own distribution fleet or do you prioritise logistics companies that have a net zero policy?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'Do you have a policy to reduce or reuse hard to recycle waste?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'What percentage of the packaging you use for your products is recycled or reusable (e.g. via Loop or other schemes)?': ['Not relevant', 'We currently do not track this metric', 'We plan to report this metric in the next 12 months'],
+    'What percentage of your procurement spend includes suppliers that are local to your business?': ['Not relevant', 'We currently do not track this metric', 'We plan to report this metric in the next 12 months'],
+    'What percentage of your procurement spend goes to suppliers that have you screened for carbon efficiency (e.g., data centres, IT / hosting providers, manufacturers, etc.)?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'If you have your own warehouse / manufacturing facilities, do you have initiatives in place to limit energy and carbon footprint?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'What percentage of your suppliers have you conducted modern slavery due diligence on?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'How many weeks of paid primary carer parental leave do you offer above statutory requirement?': ['We plan to report this metric in the next 12 months', 'Zero', '1501 or more'],
+    'How many weeks of paid secondary carer parental leave do you offer above statutory requirement?': ['We plan to report this metric in the next 12 months', 'Zero', '1501 or more'],
+    'Do you have return to work initiatives or support in place?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'What percentage of your board identify as female?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your board identify as coming from underrepresented ethnic or cultural backgrounds (as defined in relevant countries of operation)?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your board identify as LGBTQIA+?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your senior management/leadership team identify as female?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your senior management/leadership team identify as coming from underrepresented ethnic or cultural backgrounds (as defined in relevant countries of operation)?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your senior management/leadership team identify as LGBTQIA+?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your total workforce identify as female?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your total workforce identify as coming from underrepresented ethnic or cultural backgrounds (as defined in relevant countries of operation)?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'What percentage of your total workforce identify as LGBTQIA+?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'Do you provide equality, diversity and inclusion training for all of your staff?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Does your office provide an inclusive environment (e.g., disabled access, breastfeeding space, unisex bathrooms)?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'Do you have a recruitment program in place to reach people from diverse backgrounds (e.g., working with specialist head-hunters, partnering with relevant university groups, etc.)?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you offer internships, apprenticeships or trainee programmes?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have a policy or a strategy in place to provide support to staff around mental health and wellbeing?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you offer study support to staff (e.g., financial support, study leave, flexible working opportunities, etc.)?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Are all staff members paid the minimum wage?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'What percentage of your employees are eligible for health care benefits offered by your company?': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'How much have you donated to community projects in the last year? ($/£/€ terms)': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric', '£0', '£1-499', '£500-999', '£1', '000-1', '499', '£1', '500-1', '999', '£2', '000+'],
+    'Do you provide paid time off for employees to complete volunteering or community engagement activities?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'What percentage of your board members are independent?': ['Not relevant', 'We currently do not track this metric', 'We plan to report this metric in the next 12 months'],
+    'How many board meetings have you held in the previous 12 months?': ['We plan to report this metric in the next 12 months', 'Zero', '1501 or more'],
+    'Is sustainability a regular item on your board agenda?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'What is your gender pay gap? (%) Please only complete this metric if you have carried out a full gender pay gap assessment - guidance for this can be found in column H.': ['We plan to report this metric in the next 12 months', 'We currently do not track this metric'],
+    'Do you have any initiatives in place to reduce/impact your gender pay gap?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have processes and procedures to ensure compliance with data regulation (e.g., GDPR) and prevent/ monitor unintended uses of data?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'Do you offer staff codes of conduct and relevant training to support the responsible development and use of code/ AI systems?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'What percentage of your staff is trained annually on cybersecurity?': ['We currently do not track this metric', 'We plan to report this metric in the next 12 months', '0%', '1-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
+    'Have you set up cyber security controls to monitor risks in the data infrastructure and promptly report/address incidents?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'Do you have an ESG Policy in place?': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant'],
+    'Do you conduct an annual diversity and inclusion survey?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have a remote working policy in place?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have a corporate code of ethics/good business conduct policy in place?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have an anti-bribery and/or anti-corruption policy in place?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have a whistle blowing policy in place?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Do you have an anti harassment policy in place?': ['Yes', 'No - but plan to in the next 12 months', 'No'],
+    'Have you completed an industry-specific sustainability certification or accreditation? (Please provide details)': ['Yes', 'No - but plan to in the next 12 months', 'No', 'Not relevant']
+}
