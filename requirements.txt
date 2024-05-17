@@ -1,0 +1,6 @@
+streamlit
+snowflake-connector-python
+pandas
+python-docx
+openai
+datetime
