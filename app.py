@@ -61,7 +61,7 @@ if not all(st.session_state.creds.values()):
     st.stop()
 
 if not st.session_state.openai_api_key:
-    st.error("Please enter your OpenAI API key.")
+    st.error("Please enter your credentials.")
     st.stop()
 
 client = OpenAI(api_key=st.session_state.openai_api_key)
