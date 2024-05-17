@@ -5,7 +5,6 @@ from openai import OpenAI
 from data_mappings import question_answer_mapping
 from io import BytesIO
 from datetime import datetime
-import json
 
 def get_today_date():
     today = datetime.today()
@@ -14,7 +13,6 @@ def get_today_date():
 
 st.set_page_config(page_title="ESG Reporting Survey Analysis", layout="wide")
 
-# Initialize session state
 if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = []
 if 'creds' not in st.session_state:
@@ -29,8 +27,9 @@ if 'messages' not in st.session_state:
     st.session_state.messages = []
 if 'report_content' not in st.session_state:
     st.session_state.report_content = ""
+if 'openai_api_key' not in st.session_state:
+    st.session_state.openai_api_key = ""
 
-# Sidebar for credentials
 with st.sidebar:
     st.header('g360 Credentials')
     user = st.text_input('User', st.session_state.creds.get('user', ''))
@@ -39,7 +38,9 @@ with st.sidebar:
     warehouse = st.text_input('Warehouse', st.session_state.creds.get('warehouse', ''))
     database = st.text_input('Database', st.session_state.creds.get('database', ''))
     schema = st.text_input('Schema', st.session_state.creds.get('schema', ''))
-    api_key = st.text_input('OpenAI API Key', type='password', value='')
+
+    st.header('OpenAI API Key')
+    openai_api_key = st.text_input('API Key', type='password', value=st.session_state.openai_api_key)
 
     def update_creds():
         st.session_state.creds.update({
@@ -50,18 +51,20 @@ with st.sidebar:
             "database": database,
             "schema": schema
         })
-        st.session_state.api_key = api_key
+        st.session_state.openai_api_key = openai_api_key
 
     if st.button('Update Credentials'):
         update_creds()
 
-# Check for credentials
-if not all(st.session_state.creds.values()) or not api_key:
+if not all(st.session_state.creds.values()):
     st.error("Please enter all credentials.")
     st.stop()
 
-# Initialize OpenAI client
-client = OpenAI(api_key=st.session_state.api_key)
+if not st.session_state.openai_api_key:
+    st.error("Please enter your OpenAI API key.")
+    st.stop()
+
+client = OpenAI(api_key=st.session_state.openai_api_key)
 
 st.header('ESG Report Generation')
 companies = [f'Company {i}' for i in range(1, 38)]
@@ -124,8 +127,11 @@ def generate_company_report(company_id):
             comparison_results = compare_company_to_cohort(company_id, survey_data, question_answer_mapping)
             today_date = get_today_date()
 
+        # Truncate JSON data to the first 1000 characters
+        truncated_data = survey_data.to_json(orient='split')[:1000]
+
         # Include raw survey data and calculation details
-        calculation_details = """
+        calculation_details = f"""
         # Calculation Details
         1. **Survey Data Extraction:**
            - The survey data was extracted from the Snowflake database using the query:
@@ -140,11 +146,10 @@ def generate_company_report(company_id):
            - Company data was separated from the cohort data based on the COMPANY_ID.
            - The same processing steps were applied to both company-specific and cohort data.
         Here is the raw survey data in JSON format for your reference:
+        ```
+        {truncated_data}
+        ```
         """
-        # Select a subset of the JSON data for context
-        survey_json = survey_data.to_json(orient='split')
-        survey_json_dict = json.loads(survey_json)
-        subset_json = {k: survey_json_dict[k][:500] for k in survey_json_dict if isinstance(survey_json_dict[k], list)}
 
         if st.session_state.assistant is None:
             st.session_state.assistant = client.beta.assistants.create(
@@ -163,10 +168,6 @@ def generate_company_report(company_id):
         ```
         {comparison_results}
         ```
-        Here is a subset of the raw survey data in JSON format for context:
-        ```
-        {json.dumps(subset_json, separators=(',', ':'))}
-        ```
         *Please analyze the key trends, raise any critical issues, and suggest actions based on the survey data.*
         *Format your report in markdown to highlight important points and structure the narrative clearly.*
         *Ensure each fact is properly sourced and include attributions in the footnotes. Use the provided raw survey data and calculation details to explain the exact data points used to get a statistic.*
@@ -177,7 +178,7 @@ def generate_company_report(company_id):
            ```
            {today_date}
            ```
-           and the report is being prepared for ACT Venture Capital
+           and the report is being prepared for UNAMED Venture Capital
         2. **Key Findings:**
            - Summarize the most important results.
            - Highlight significant trends and patterns.
@@ -201,7 +202,7 @@ def generate_company_report(company_id):
         4. **SWOT Analysis:**
            - **Strengths:**
              - Identify and discuss the strengths revealed by the survey data.
-             - Ensure each fact is properly sourced and include at            attributions in the footnotes.
+             - Ensure each fact is properly sourced and include attributions in the footnotes.
            - **Weaknesses:**
              - Identify and discuss the weaknesses revealed by the survey data.
              - Ensure each fact is properly sourced and include attributions in the footnotes.
@@ -266,8 +267,11 @@ def generate_report():
             processed_data = process_survey_data(survey_data, question_answer_mapping)
             today_date = get_today_date()
 
+        # Truncate JSON data to the first 1000 characters
+        truncated_data = survey_data.to_json(orient='split')[:1000]
+
         # Include raw survey data and calculation details
-        calculation_details = """
+        calculation_details = f"""
         # Calculation Details
         1. **Survey Data Extraction:**
            - The survey data was extracted from the Snowflake database using the query:
@@ -282,11 +286,10 @@ def generate_report():
            - Company data was separated from the cohort data based on the COMPANY_ID.
            - The same processing steps were applied to both company-specific and cohort data.
         Here is the raw survey data in JSON format for your reference:
+        ```
+        {truncated_data}
+        ```
         """
-        # Select a subset of the JSON data for context
-        survey_json = survey_data.to_json(orient='split')
-        survey_json_dict = json.loads(survey_json)
-        subset_json = {k: survey_json_dict[k][:500] for k in survey_json_dict if isinstance(survey_json_dict[k], list)}
 
         if st.session_state.assistant is None:
             st.session_state.assistant = client.beta.assistants.create(
@@ -305,10 +308,6 @@ def generate_report():
         ```
         {processed_data}
         ```
-        Here is a subset of the raw survey data in JSON format for context:
-        ```
-        {json.dumps(subset_json, separators=(',', ':'))}
-        ```
         *Please analyze the key trends, raise any critical issues, and suggest actions based on the survey data.*
         *Format your report in markdown to highlight important points and structure the narrative clearly.*
         *Ensure each fact is properly sourced and include attributions in the footnotes. Use the provided raw survey data and calculation details to explain the exact data points used to get a statistic.*
@@ -319,7 +318,7 @@ def generate_report():
            ```
            {today_date}
            ```
-           and the report is being prepared for ACT Venture Capital
+           and the report is being prepared for UNAMED Venture Capital
         2. **Key Findings:**
            - Summarize the most important results.
            - Highlight significant trends and patterns.
@@ -406,7 +405,6 @@ if st.button('Generate Report for Selected Company'):
     company_id = int(selected_company.split()[-1])
     generate_company_report(company_id)
 
-
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -426,7 +424,6 @@ with st.sidebar:
 if st.session_state.report_generated:
     st.header("Ask Follow-up Questions")
     user_question = st.chat_input("Enter your question related to the report:")
-
     if user_question:
         st.session_state.conversation_history.append({"role": "user", "content": user_question})
         st.session_state.messages.append({"role": "user", "content": user_question})
@@ -457,5 +454,3 @@ if st.session_state.report_generated:
                 st.error("No messages found in the thread.")
         else:
             st.error(f"Follow-up question failed with status: {run.status}")
-
-
