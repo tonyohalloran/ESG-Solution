@@ -67,6 +67,31 @@ If you still want to run it locally, follow these steps:
    streamlit run app.py
    ```
 
+## Data Setup and Getting Credentials 
+**Sign Up for Gather360 Trial**
+- Visit Gather360: Go to the gather360 signup page[https://app.g360.io/signup].
+- Sign Up: Sign up for a trial account by providing the required information.
+- Activate Account: Check your email for an activation link and complete the registration process.
+
+**Access the ESG Recipe on Gather360**
+- Login: Login to your gather360 account.
+- Navigate to Recipes: Go to the 'Recipes' section from the dashboard.
+- Select ESG Recipe: Find and select the ESG reporting recipe.
+  
+**Upload Sample Data to Gather360**
+- Prepare Data: Ensure your sample data is formatted according to gather360's requirements.
+- Upload Data: Use the data upload feature within the ESG recipe to upload your sample data.
+
+**Obtain Gather360 Credentials**
+- Go to Settings: In gather360, navigate to the 'Workplace Settings' section and then select 'Connection'.
+- API Keys: Locate the API keys section to find your credentials (user, password, account, warehouse, database, schema).
+
+- Obtain OpenAI Credentials
+- Visit OpenAI: Go to the OpenAI website.
+- Sign In/Sign Up: Sign in to your account or sign up if you don’t have one.
+- API Keys: Navigate to the API section to retrieve your API key.
+
+
 ## Usage
 
 1. **Input Credentials**: Enter your gather360 and OpenAI credentials in the sidebar.
