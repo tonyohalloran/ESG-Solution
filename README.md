@@ -47,7 +47,7 @@ Our thesis is simple yet profound: The right data unlocks AI's potential. By pro
 
 ## Installation
 
-You can directly use the app without cloning the repository by visiting [https://esg-solution.streamlit.app/](https://esg-solution.streamlit.app/).
+You can directly use the app without cloning the repository by visiting [the web app page](https://esg-solution.streamlit.app/).
 
 If you still want to run it locally, follow these steps:
 
@@ -69,7 +69,7 @@ If you still want to run it locally, follow these steps:
 
 ## Data Setup and Getting Credentials 
 **Sign Up for Gather360 Trial**
-- Visit Gather360: Go to the gather360 signup page[https://app.g360.io/signup].
+- Visit Gather360: Go to the gather360 signup [page]([https://app.g360.io/signup]).
 - Sign Up: Sign up for a trial account by providing the required information.
 - Activate Account: Check your email for an activation link and complete the registration process.
 
