@@ -69,7 +69,7 @@ If you still want to run it locally, follow these steps:
 
 ## Data Setup and Getting Credentials 
 **Sign Up for Gather360 Trial**
-- Visit Gather360: Go to the gather360 signup [page]([https://app.g360.io/signup]).
+- Visit Gather360: Go to the gather360 signup [link](https://app.g360.io/signup) 
 - Sign Up: Sign up for a trial account by providing the required information.
 - Activate Account: Check your email for an activation link and complete the registration process.
 
