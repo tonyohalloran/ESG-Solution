@@ -75,7 +75,7 @@ If you still want to run it locally, follow these steps:
 
 **Access the ESG Recipe on gather360**
 - Login: Login to your gather360 account.
-- Go to the "Open Marketplace" button when you land on the home workspace in g360 after first sign-in
+- Go to 'Datasets' tab and then select 'Open Marketplace' when you land on the home workspace in g360 after first sign-in
 - Navigate to the Data Solutions tab
 - Select the "ESG Investor Analysis" solution.
 - Press install and wait for 3 to 4 minutes while the recipe downloads
