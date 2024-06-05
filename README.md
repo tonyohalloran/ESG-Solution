@@ -68,24 +68,24 @@ If you still want to run it locally, follow these steps:
    ```
 
 ## Data Setup and Getting Credentials 
-**Sign Up for Gather360 Trial**
-- Visit Gather360: Go to the gather360 signup [link](https://app.g360.io/signup) 
+**Sign Up for gather360 Trial**
+- Visit gather360: Go to the gather360 signup [link](https://app.g360.io/signup) 
 - Sign Up: Sign up for a trial account by providing the required information.
 - Activate Account: Check your email for an activation link and complete the registration process.
 
-**Access the ESG Recipe on Gather360**
+**Access the ESG Recipe on gather360**
 - Login: Login to your gather360 account.
-- Navigate to Recipes: Go to the 'Recipes' section from the dashboard.
-- Select ESG Recipe: Find and select the ESG reporting recipe.
-  
-**Upload Sample Data to Gather360**
-- Prepare Data: Ensure your sample data is formatted according to gather360's requirements.
-- Upload Data: Use the data upload feature within the ESG recipe to upload your sample data.
+- Go to the "Open Marketplace" button when you land on the homw workspace in g360 after first sign in
+- Navigate to the Data Solutions tab
+- Select the "ESG Investor Analysis" solution.
+- Press install and wait for 3 to 4 minutes while the recipe downloads
+- Once completed navigate back to the home workspace and go to the "Live" tab
+- See the 7 datasets that form the ESG Analysis data model
+- Sample data has been loaded as part of the installation process
 
-**Obtain Gather360 Credentials**
+**Obtain gather360 Credentials**
 - Go to Settings: In gather360, navigate to the 'Workplace Settings' section and then select 'Connection'.
 - API Keys: Locate the API keys section to find your credentials (user, password, account, warehouse, database, schema).
-
 - Obtain OpenAI Credentials
 - Visit OpenAI: Go to the OpenAI website.
 - Sign In/Sign Up: Sign in to your account or sign up if you don’t have one.
