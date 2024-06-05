@@ -72,12 +72,13 @@ If you still want to run it locally, follow these steps:
 - Visit gather360: Go to the gather360 signup [link](https://app.g360.io/signup) 
 - Sign Up: Sign up for a trial account by providing the required information.
 - Activate Account: Check your email for an activation link and complete the registration process.
+- When you create the workspace, ensure to leave 'Workspace table prefix' blank. 
 
 **Access the ESG Recipe on gather360**
 - Login: Login to your gather360 account.
 - Go to 'Datasets' tab and then select 'Open Marketplace' when you land on the home workspace in g360 after first sign-in
 - Navigate to the Data Solutions tab
-- Select the "ESG Investor Analysis" solution.
+- Select the "ESG Investor Reporting" solution.
 - Press install and wait for 3 to 4 minutes while the recipe downloads
 - Once completed, navigate back to the home workspace and go to the "Live" tab
 - See the 7 datasets that form the ESG Analysis data model
@@ -90,6 +91,7 @@ If you still want to run it locally, follow these steps:
 - Visit OpenAI: Go to the OpenAI website.
 - Sign In/Sign Up: Sign in to your account or sign up if you don’t have one.
 - API Keys: Navigate to the API section to retrieve your API key.
+- Unless you have specified otherwise, the account is 'yi47469.north-europe.azure'
 
 
 ## Usage
