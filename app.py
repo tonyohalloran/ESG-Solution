@@ -44,19 +44,17 @@ with st.sidebar:
 
     def update_creds():
         st.session_state.creds.update({
-            "user": user.strip(),
-            "password": password.strip(),
-            "account": account.strip(),
-            "warehouse": warehouse.strip(),
-            "database": database.strip(),
-            "schema": schema.strip()
+            "user": user,
+            "password": password,
+            "account": account,
+            "warehouse": warehouse,
+            "database": database,
+            "schema": schema
         })
-        st.session_state.openai_api_key = openai_api_key.strip()
-        st.write("Updated credentials: ", st.session_state.creds)  # Add logging to check
+        st.session_state.openai_api_key = openai_api_key
 
     if st.button('Update Credentials'):
         update_creds()
-        st.write("Credentials after update: ", st.session_state.creds)
 
 if not all(st.session_state.creds.values()):
     st.error("Please enter all credentials.")
@@ -74,31 +72,23 @@ selected_company = st.selectbox('Select Company', companies)
 
 def fetch_data_from_snowflake(query):
     creds = st.session_state.creds
-    st.write("Using credentials: ", creds)  # Add logging to check
+    conn = snowflake.connector.connect(
+        user=creds["user"],
+        password=creds["password"],
+        account=creds["account"],
+        warehouse=creds["warehouse"],
+        database=creds["database"],
+        schema=creds["schema"]
+    )
     try:
-        conn = snowflake.connector.connect(
-            user=creds["user"],
-            password=creds["password"],
-            account=creds["account"],
-            warehouse=creds["warehouse"],
-            database=creds["database"],
-            schema=creds["schema"]
-        )
-        st.write("Connected to Database")  # Print confirmation message
         cur = conn.cursor()
         cur.execute(query)
         rows = cur.fetchall()
         df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
         return df
-    except Exception as e:
-        st.error(f"Failed to fetch data from Snowflake: {e}")
-        return None
     finally:
-        try:
-            cur.close()
-            conn.close()
-        except:
-            pass
+        cur.close()
+        conn.close()
 
 def process_survey_data(survey_data, question_answer_mapping):
     results = {}
@@ -464,5 +454,4 @@ if st.session_state.report_generated:
                 st.error("No messages found in the thread.")
         else:
             st.error(f"Follow-up question failed with status: {run.status}")
-
 
