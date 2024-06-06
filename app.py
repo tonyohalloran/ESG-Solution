@@ -121,7 +121,7 @@ def compare_company_to_cohort(company_id, survey_data, question_answer_mapping):
 def generate_company_report(company_id):
     with st.spinner('Generating report for selected company...'):
         with st.spinner('Fetching data from Snowflake...'):
-            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1_ALL_DATA")
+            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1")
 
         with st.spinner('Processing survey data...'):
             comparison_results = compare_company_to_cohort(company_id, survey_data, question_answer_mapping)
@@ -136,7 +136,7 @@ def generate_company_report(company_id):
         1. **Survey Data Extraction:**
            - The survey data was extracted from the Snowflake database using the query:
            ```
-           SELECT * FROM MEASUREMENT_V1_ALL_DATA
+           SELECT * FROM MEASUREMENT_V1
            ```
         2. **Processing Survey Data:**
            - For each question, the responses were filtered and counted.
@@ -261,7 +261,7 @@ def generate_company_report(company_id):
 def generate_report():
     with st.spinner('Generating report...'):
         with st.spinner('Fetching data from Snowflake...'):
-            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1_ALL_DATA")
+            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1")
 
         with st.spinner('Processing survey data...'):
             processed_data = process_survey_data(survey_data, question_answer_mapping)
@@ -276,7 +276,7 @@ def generate_report():
         1. **Survey Data Extraction:**
            - The survey data was extracted from the Snowflake database using the query:
            ```
-           SELECT * FROM MEASUREMENT_V1_ALL_DATA
+           SELECT * FROM MEASUREMENT_V1
            ```
         2. **Processing Survey Data:**
            - For each question, the responses were filtered and counted.
