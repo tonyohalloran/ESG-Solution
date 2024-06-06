@@ -44,17 +44,19 @@ with st.sidebar:
 
     def update_creds():
         st.session_state.creds.update({
-            "user": user,
-            "password": password,
-            "account": account,
-            "warehouse": warehouse,
-            "database": database,
-            "schema": schema
+            "user": user.strip(),
+            "password": password.strip(),
+            "account": account.strip(),
+            "warehouse": warehouse.strip(),
+            "database": database.strip(),
+            "schema": schema.strip()
         })
-        st.session_state.openai_api_key = openai_api_key
+        st.session_state.openai_api_key = openai_api_key.strip()
+        st.write("Updated credentials: ", st.session_state.creds)  # Add logging to check
 
     if st.button('Update Credentials'):
         update_creds()
+        st.write("Credentials after update: ", st.session_state.creds)
 
 if not all(st.session_state.creds.values()):
     st.error("Please enter all credentials.")
@@ -72,6 +74,7 @@ selected_company = st.selectbox('Select Company', companies)
 
 def fetch_data_from_snowflake(query):
     creds = st.session_state.creds
+    st.write("Using credentials: ", creds)  # Add logging to check
     try:
         conn = snowflake.connector.connect(
             user=creds["user"],
@@ -81,6 +84,7 @@ def fetch_data_from_snowflake(query):
             database=creds["database"],
             schema=creds["schema"]
         )
+        st.write("Connected to Database")  # Print confirmation message
         cur = conn.cursor()
         cur.execute(query)
         rows = cur.fetchall()
