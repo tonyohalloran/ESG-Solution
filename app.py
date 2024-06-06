@@ -72,23 +72,29 @@ selected_company = st.selectbox('Select Company', companies)
 
 def fetch_data_from_snowflake(query):
     creds = st.session_state.creds
-    conn = snowflake.connector.connect(
-        user=creds["user"],
-        password=creds["password"],
-        account=creds["account"],
-        warehouse=creds["warehouse"],
-        database=creds["database"],
-        schema=creds["schema"]
-    )
     try:
+        conn = snowflake.connector.connect(
+            user=creds["user"],
+            password=creds["password"],
+            account=creds["account"],
+            warehouse=creds["warehouse"],
+            database=creds["database"],
+            schema=creds["schema"]
+        )
         cur = conn.cursor()
         cur.execute(query)
         rows = cur.fetchall()
         df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
         return df
+    except Exception as e:
+        st.error(f"Failed to fetch data from Snowflake: {e}")
+        return None
     finally:
-        cur.close()
-        conn.close()
+        try:
+            cur.close()
+            conn.close()
+        except:
+            pass
 
 def process_survey_data(survey_data, question_answer_mapping):
     results = {}
