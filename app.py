@@ -52,7 +52,7 @@ with st.sidebar:
             "schema": schema.strip()
         })
         st.session_state.openai_api_key = openai_api_key.strip()
-        st.write("Updated credentials: ", st.session_state.creds)
+        st.write("Updated credentials: ", st.session_state.creds)  # Add logging to check
 
     if st.button('Update Credentials'):
         update_creds()
@@ -63,7 +63,7 @@ if not all(st.session_state.creds.values()):
     st.stop()
 
 if not st.session_state.openai_api_key:
-    st.error("Please enter your API key.")
+    st.error("Please enter your credentials.")
     st.stop()
 
 client = OpenAI(api_key=st.session_state.openai_api_key)
@@ -74,6 +74,7 @@ selected_company = st.selectbox('Select Company', companies)
 
 def fetch_data_from_snowflake(query):
     creds = st.session_state.creds
+    st.write("Using credentials: ", creds)  # Add logging to check
     try:
         conn = snowflake.connector.connect(
             user=creds["user"],
@@ -83,7 +84,7 @@ def fetch_data_from_snowflake(query):
             database=creds["database"],
             schema=creds["schema"]
         )
-        st.write("Connected to Database")
+        st.write("Connected to Database")  # Print confirmation message
         cur = conn.cursor()
         cur.execute(query)
         rows = cur.fetchall()
@@ -127,16 +128,13 @@ def compare_company_to_cohort(company_id, survey_data, question_answer_mapping):
         }
     return comparison_results
 
-def generate_report():
-    with st.spinner('Generating report...'):
+def generate_company_report(company_id):
+    with st.spinner('Generating report for selected company...'):
         with st.spinner('Fetching data from Snowflake...'):
             survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1_ALL_DATA")
-            if survey_data is None:
-                st.error("Failed to fetch survey data from Snowflake.")
-                return
 
         with st.spinner('Processing survey data...'):
-            processed_data = process_survey_data(survey_data, question_answer_mapping)
+            comparison_results = compare_company_to_cohort(company_id, survey_data, question_answer_mapping)
             today_date = get_today_date()
 
         # Truncate JSON data to the first 1000 characters
@@ -174,11 +172,11 @@ def generate_report():
             st.session_state.thread = client.beta.threads.create()
 
         summary_prompt = f"""
-        **Executive Summary of Survey Results**
-        Below is a nested dictionary with the key results of a survey:
+        **Executive Summary of Survey Results for {selected_company}**
+        Below is a nested dictionary with the key results of the survey for the selected company compared to the cohort:
         Ensure that there is a clear narrative in the report.
         ```
-        {processed_data}
+        {comparison_results}
         ```
         *Please analyze the key trends, raise any critical issues, and suggest actions based on the survey data.*
         *Format your report in markdown to highlight important points and structure the narrative clearly.*
@@ -270,16 +268,13 @@ def generate_report():
         else:
             st.error(f"Report generation failed with status: {run.status}")
 
-def generate_company_report(company_id):
-    with st.spinner('Generating report for selected company...'):
+def generate_report():
+    with st.spinner('Generating report...'):
         with st.spinner('Fetching data from Snowflake...'):
             survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1_ALL_DATA")
-            if survey_data is None:
-                st.error("Failed to fetch survey data from Snowflake.")
-                return
 
         with st.spinner('Processing survey data...'):
-            comparison_results = compare_company_to_cohort(company_id, survey_data, question_answer_mapping)
+            processed_data = process_survey_data(survey_data, question_answer_mapping)
             today_date = get_today_date()
 
         # Truncate JSON data to the first 1000 characters
@@ -317,11 +312,11 @@ def generate_company_report(company_id):
             st.session_state.thread = client.beta.threads.create()
 
         summary_prompt = f"""
-        **Executive Summary of Survey Results for {selected_company}**
-        Below is a nested dictionary with the key results of the survey for the selected company compared to the cohort:
+        **Executive Summary of Survey Results**
+        Below is a nested dictionary with the key results of a survey:
         Ensure that there is a clear narrative in the report.
         ```
-        {comparison_results}
+        {processed_data}
         ```
         *Please analyze the key trends, raise any critical issues, and suggest actions based on the survey data.*
         *Format your report in markdown to highlight important points and structure the narrative clearly.*
