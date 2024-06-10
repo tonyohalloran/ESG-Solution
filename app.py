@@ -35,7 +35,7 @@ with st.sidebar:
     user = st.text_input('User', st.session_state.creds.get('user', ''))
     password = st.text_input('Password', type='password', value=st.session_state.creds.get('password', ''))
     account = st.text_input('Account', st.session_state.creds.get('account', ''))
-    # warehouse = st.text_input('Warehouse', st.session_state.creds.get('warehouse', ''))
+    warehouse = st.text_input('Warehouse', st.session_state.creds.get('warehouse', ''))
     database = st.text_input('Database', st.session_state.creds.get('database', ''))
     schema = st.text_input('Schema', st.session_state.creds.get('schema', ''))
 
@@ -47,7 +47,7 @@ with st.sidebar:
             "user": user,
             "password": password,
             "account": account,
-            # "warehouse": warehouse,
+            "warehouse": warehouse,
             "database": database,
             "schema": schema
         })
@@ -76,7 +76,7 @@ def fetch_data_from_snowflake(query):
         user=creds["user"],
         password=creds["password"],
         account=creds["account"],
-        warehouse= "yi47469.north-europe.azure",
+        warehouse=creds["warehouse"],
         database=creds["database"],
         schema=creds["schema"]
     )
@@ -121,7 +121,7 @@ def compare_company_to_cohort(company_id, survey_data, question_answer_mapping):
 def generate_company_report(company_id):
     with st.spinner('Generating report for selected company...'):
         with st.spinner('Fetching data from Snowflake...'):
-            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1")
+            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1_ALL_DATA")
 
         with st.spinner('Processing survey data...'):
             comparison_results = compare_company_to_cohort(company_id, survey_data, question_answer_mapping)
@@ -136,7 +136,7 @@ def generate_company_report(company_id):
         1. **Survey Data Extraction:**
            - The survey data was extracted from the Snowflake database using the query:
            ```
-           SELECT * FROM MEASUREMENT_V1
+           SELECT * FROM MEASUREMENT_V1_ALL_DATA
            ```
         2. **Processing Survey Data:**
            - For each question, the responses were filtered and counted.
@@ -261,7 +261,7 @@ def generate_company_report(company_id):
 def generate_report():
     with st.spinner('Generating report...'):
         with st.spinner('Fetching data from Snowflake...'):
-            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1")
+            survey_data = fetch_data_from_snowflake("SELECT * FROM MEASUREMENT_V1_ALL_DATA")
 
         with st.spinner('Processing survey data...'):
             processed_data = process_survey_data(survey_data, question_answer_mapping)
@@ -276,7 +276,7 @@ def generate_report():
         1. **Survey Data Extraction:**
            - The survey data was extracted from the Snowflake database using the query:
            ```
-           SELECT * FROM MEASUREMENT_V1
+           SELECT * FROM MEASUREMENT_V1_ALL_DATA
            ```
         2. **Processing Survey Data:**
            - For each question, the responses were filtered and counted.
