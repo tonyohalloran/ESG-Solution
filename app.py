@@ -35,7 +35,7 @@ with st.sidebar:
     user = st.text_input('User', st.session_state.creds.get('user', ''))
     password = st.text_input('Password', type='password', value=st.session_state.creds.get('password', ''))
     account = st.text_input('Account', st.session_state.creds.get('account', ''))
-    warehouse = st.text_input('Warehouse', st.session_state.creds.get('warehouse', ''))
+    # warehouse = st.text_input('Warehouse', st.session_state.creds.get('warehouse', ''))
     database = st.text_input('Database', st.session_state.creds.get('database', ''))
     schema = st.text_input('Schema', st.session_state.creds.get('schema', ''))
 
@@ -47,7 +47,7 @@ with st.sidebar:
             "user": user,
             "password": password,
             "account": account,
-            "warehouse": warehouse,
+            # "warehouse": warehouse,
             "database": database,
             "schema": schema
         })
@@ -76,7 +76,7 @@ def fetch_data_from_snowflake(query):
         user=creds["user"],
         password=creds["password"],
         account=creds["account"],
-        warehouse=creds["warehouse"],
+        warehouse= "yi47469.north-europe.azure"
         database=creds["database"],
         schema=creds["schema"]
     )
