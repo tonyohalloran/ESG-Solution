@@ -76,7 +76,7 @@ def fetch_data_from_snowflake(query):
         user=creds["user"],
         password=creds["password"],
         account=creds["account"],
-        warehouse= "yi47469.north-europe.azure"
+        warehouse= "yi47469.north-europe.azure",
         database=creds["database"],
         schema=creds["schema"]
     )
