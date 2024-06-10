@@ -32,8 +32,8 @@ if 'openai_api_key' not in st.session_state:
 
 with st.sidebar:
     st.header('g360 Credentials')
-    user = st.text_input('User', st.session_state.creds.get('user', ''))
-    password = st.text_input('Password', type='password', value=st.session_state.creds.get('password', ''))
+    user = st.text_input('Workspace Service ID', st.session_state.creds.get('user', ''))
+    password = st.text_input('Key', type='password', value=st.session_state.creds.get('password', ''))
     account = st.text_input('Account', st.session_state.creds.get('account', ''))
     # warehouse = st.text_input('Warehouse', st.session_state.creds.get('warehouse', ''))
     database = st.text_input('Database', st.session_state.creds.get('database', ''))
